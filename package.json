@@ -18,9 +18,17 @@
     "prepublishOnly": "npm run build"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Appcockpit <support@appcockpit.dev> (https://appcockpit.dev)",
+  "homepage": "https://github.com/appcockpit/appcockpit-react-native-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/appcockpit/appcockpit-react-native-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/appcockpit/appcockpit-react-native-sdk/issues"
+  },
+  "license": "MIT",
+  "description": "Official appcockpit.dev SDK for React Native apps.",
   "devDependencies": {
     "@types/node": "^24.3.0",
     "@types/react": "^18.0.0",

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "lib": ["es2017", "es6", "dom"],
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmitOnError": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+}

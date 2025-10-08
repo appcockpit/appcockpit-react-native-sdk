@@ -36,7 +36,7 @@ export const checkVersionUpgrade = async (
     }
 
     if (versionData.force_update) {
-      showForceUpdateAlert(info.platform, info.appstoreId);
+      showForceUpdateAlert(info.platform, info.appstoreId, versionData);
     } else {
       showUpdateAlert(info.appId, info.appstoreId, versionData);
     }

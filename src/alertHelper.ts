@@ -7,23 +7,38 @@ let isAlertOpen = false;
 
 export const showForceUpdateAlert = (
   platform: "ios" | "android",
-  appstoreId: string
+  appstoreId: string,
+  versionData: VersionResponse
 ) => {
   if (isAlertOpen) {
     return;
   }
 
   isAlertOpen = true;
+
+  const message =
+    versionData.update_message ||
+    "A critical update is required. Please update to continue using the app.";
+
   Alert.alert(
     "Update Required",
-    "A critical update is required. Please update to continue using the app.",
+    message,
     [
       {
         text: "Update Now",
-        onPress: () => {
+        onPress: async () => {
           isAlertOpen = false;
 
-          openAppStore(platform, appstoreId);
+          try {
+            await openAppStore(platform, appstoreId);
+
+            setTimeout(
+              () => showForceUpdateAlert(platform, appstoreId, versionData),
+              1000
+            );
+          } catch (error) {
+            console.error("Error opening app store:", error);
+          }
         },
       },
     ],
@@ -44,9 +59,13 @@ export const showUpdateAlert = (
 
   isAlertOpen = true;
 
+  const message =
+    versionData.update_message ||
+    "An update is available. Please update to get the latest features and improvements.";
+
   Alert.alert(
     "Update Available",
-    "An update is available. Please update to get the latest features and improvements.",
+    message,
     [
       {
         text: "Update Now",

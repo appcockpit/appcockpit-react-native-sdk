@@ -30,12 +30,8 @@ export const showForceUpdateAlert = (
           isAlertOpen = false;
 
           try {
+            showForceUpdateAlert(platform, appstoreId, versionData);
             await openAppStore(platform, appstoreId);
-
-            setTimeout(
-              () => showForceUpdateAlert(platform, appstoreId, versionData),
-              1000
-            );
           } catch (error) {
             console.error("Error opening app store:", error);
           }

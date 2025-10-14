@@ -1,5 +1,5 @@
-import { API_BASE_URL, CLIENT_VERSION } from "./constants";
-import { MaintenanceInfo, MaintenanceResponse } from "./models";
+import { API_BASE_URL, CLIENT_VERSION } from "../constants";
+import { MaintenanceInfo, MaintenanceResponse } from "../models";
 
 export const getMaintenanceMode = async (
   info: MaintenanceInfo,

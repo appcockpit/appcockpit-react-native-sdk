@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
+import { VersionResponse } from "../models";
+import { storeDismissedVersion } from "../storageHelper";
 import { openAppStore } from "./appstoreHelper";
-import { VersionResponse } from "./models";
-import { storeDismissedVersion } from "./storageHelper";
 
 let isAlertOpen = false;
 

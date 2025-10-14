@@ -1,4 +1,4 @@
-export type VersionInfo = {
+export type AppInfo = {
   platform: "ios" | "android";
   appId: string;
   appstoreId: string;

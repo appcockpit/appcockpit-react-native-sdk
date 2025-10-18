@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
 import { AppInfo, VersionResponse } from "../models";
-import { isVersionDismissed, storeDismissedVersion } from "../storageHelper";
+import { storeDismissedVersion } from "../storageHelper";
 import { fetchVersion } from "../versions/api";
 import { openAppStore } from "./appstoreHelper";
 import { AppUpdateScreen, UpdateButtonTheme } from "./AppUpdateScreen";
@@ -74,7 +74,9 @@ export const AppUpdateProvider: FC<Props> = ({
       console.error("Error opening app store:", error);
     }
 
-    setShowUpdateScreen(false);
+    if (versionInfo && !versionInfo.force_update) {
+      setShowUpdateScreen(false);
+    }
   }, [info, versionInfo]);
 
   const handleClose = useCallback(async () => {

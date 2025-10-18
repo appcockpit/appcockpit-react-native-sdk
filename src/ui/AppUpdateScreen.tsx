@@ -37,8 +37,8 @@ export const AppUpdateScreen: FC<Props> = ({
     : "Update Available";
 
   const defaultDescription = versionInfo.force_update
-    ? `A critical update is required to continue using the app. Please update to version ${versionInfo.version}.`
-    : `A new version (${versionInfo.version}) is available. Update now to get the latest features and improvements.`;
+    ? `A critical update is required to continue using the app.`
+    : `A new version is available. Update now to get the latest features and improvements.`;
 
   return (
     <>

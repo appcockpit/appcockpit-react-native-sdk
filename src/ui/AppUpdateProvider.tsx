@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
 import { AppInfo, VersionResponse } from "../models";
-import { storeDismissedVersion } from "../storageHelper";
+import { isVersionDismissed, storeDismissedVersion } from "../storageHelper";
 import { fetchVersion } from "../versions/api";
 import { openAppStore } from "./appstoreHelper";
 import { AppUpdateScreen, UpdateButtonTheme } from "./AppUpdateScreen";

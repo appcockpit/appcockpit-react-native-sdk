@@ -22,4 +22,8 @@ export type MaintenanceResponse = {
   active: boolean;
   title: string | null;
   message: string | null;
+  links?: Array<{
+    title: string;
+    url: string;
+  }>;
 };

@@ -21,7 +21,7 @@ export type MaintenanceInfo = {
 export type MaintenanceResponse = {
   active: boolean;
   title: string | null;
-  message: string | null;
+  description: string | null;
   links?: Array<{
     title: string;
     url: string;

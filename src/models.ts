@@ -10,7 +10,8 @@ export type VersionResponse = {
   version: string;
   platform: "ios" | "android";
   force_update: boolean;
-  update_message: string | null;
+  default_update_message: string | null;
+  update_messages?: Record<string, string>;
 };
 
 export type MaintenanceInfo = {

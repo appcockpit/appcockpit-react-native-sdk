@@ -6,7 +6,7 @@ export const getMaintenanceMode = async (
   apiToken: string
 ): Promise<MaintenanceResponse | null> => {
   try {
-    const url = `${API_BASE_URL}/maintenance?app_id=${info.appId}&environment=${info.environment}`;
+    const url = `${API_BASE_URL}/v2/maintenance?app_id=${info.appId}&environment=${info.environment}`;
 
     const response = await fetch(url, {
       method: "GET",

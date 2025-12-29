@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { LanguageKey, LOCALIZED_STRINGS } from "../constants";
 import { VersionResponse } from "../models";
 
 export type UpdateButtonTheme = {
@@ -17,6 +18,7 @@ export type UpdateButtonTheme = {
 export type Props = PropsWithChildren<{
   visible: boolean;
   versionInfo: VersionResponse;
+  languageKey?: LanguageKey;
   theme?: {
     updateButton?: UpdateButtonTheme;
   };
@@ -27,18 +29,29 @@ export type Props = PropsWithChildren<{
 export const AppUpdateScreen: FC<Props> = ({
   visible,
   versionInfo,
+  languageKey,
   theme,
   children,
   onClose,
   onUpdate,
 }) => {
-  const defaultTitle = versionInfo.force_update
-    ? "Update Required"
-    : "Update Available";
+  const activeLanguageKey = languageKey || LanguageKey.EN;
+  const strings = LOCALIZED_STRINGS[activeLanguageKey];
+
+  const title = versionInfo.force_update
+    ? strings.updateRequired
+    : strings.updateAvailable;
 
   const defaultDescription = versionInfo.force_update
-    ? `A critical update is required to continue using the app.`
-    : `A new version is available. Update now to get the latest features and improvements.`;
+    ? strings.forceUpdateDescription
+    : strings.updateDescription;
+
+  const updateMessage =
+    versionInfo.update_messages && languageKey
+      ? versionInfo.update_messages[languageKey] ||
+        versionInfo.default_update_message ||
+        defaultDescription
+      : versionInfo.default_update_message || defaultDescription;
 
   return (
     <>
@@ -50,11 +63,9 @@ export const AppUpdateScreen: FC<Props> = ({
       >
         <SafeAreaView style={styles.fullScreen}>
           <View style={styles.topContent}>
-            <Text style={styles.title}>{defaultTitle}</Text>
+            <Text style={styles.title}>{title}</Text>
 
-            <Text style={styles.description}>
-              {versionInfo.update_message || defaultDescription}
-            </Text>
+            <Text style={styles.description}>{updateMessage}</Text>
           </View>
 
           <View style={styles.bottomContent}>
@@ -77,7 +88,7 @@ export const AppUpdateScreen: FC<Props> = ({
                     },
                   ]}
                 >
-                  {"Update now"}
+                  {strings.updateNow}
                 </Text>
               </TouchableOpacity>
 
@@ -86,7 +97,7 @@ export const AppUpdateScreen: FC<Props> = ({
                   style={[styles.button, styles.laterButton]}
                   onPress={onClose}
                 >
-                  <Text style={styles.laterButtonText}>{"Later"}</Text>
+                  <Text style={styles.laterButtonText}>{strings.later}</Text>
                 </TouchableOpacity>
               )}
             </View>

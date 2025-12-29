@@ -1,4 +1,5 @@
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
+import { LanguageKey } from "../constants";
 import { AppInfo, VersionResponse } from "../models";
 import { isVersionDismissed, storeDismissedVersion } from "../storageHelper";
 import { fetchVersion } from "../versions/api";
@@ -16,6 +17,7 @@ type Props = PropsWithChildren<{
   info: AppInfo;
   apiToken: string;
   UpdateScreen?: FC<UpdateScreenProps>;
+  languageKey?: LanguageKey;
   theme?: {
     updateButton?: UpdateButtonTheme;
   };
@@ -26,6 +28,7 @@ export const AppUpdateProvider: FC<Props> = ({
   info,
   apiToken,
   UpdateScreen,
+  languageKey,
   theme,
 }) => {
   const [versionInfo, setVersionInfo] = useState<VersionResponse | null>(null);
@@ -112,6 +115,7 @@ export const AppUpdateProvider: FC<Props> = ({
       visible={showUpdateScreen}
       versionInfo={versionInfo}
       children={children}
+      languageKey={languageKey}
       theme={theme}
       onUpdate={handleUpdate}
       onClose={handleClose}

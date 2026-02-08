@@ -4,6 +4,7 @@ export type AppInfo = {
   appstoreId: string;
   appVersion: string;
   environment: string;
+  userId?: string | null;
 };
 
 export type VersionResponse = {
@@ -27,4 +28,18 @@ export type MaintenanceResponse = {
     title: string;
     url: string;
   }>;
+};
+
+export type AuthenticateRequest = {
+  user_id: string;
+  platform: "ios" | "android";
+  app_version: string;
+  environment?: string;
+};
+
+export type AuthenticateResponse = {
+  success: boolean;
+  user_id: string;
+  platform: string;
+  app_version: string;
 };

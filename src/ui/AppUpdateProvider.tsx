@@ -1,4 +1,5 @@
 import { FC, PropsWithChildren, useCallback, useEffect, useState } from "react";
+import { authenticate } from "../authenticate/api";
 import { LanguageKey } from "../constants";
 import { AppInfo, VersionResponse } from "../models";
 import { isVersionDismissed, storeDismissedVersion } from "../storageHelper";
@@ -64,6 +65,12 @@ export const AppUpdateProvider: FC<Props> = ({
 
   useEffect(() => {
     fetchVersionInfo();
+
+    if (info.userId) {
+      authenticate(info, apiToken, info.userId).catch((error) => {
+        console.error("Error authenticating user:", error);
+      });
+    }
   }, [info, apiToken]);
 
   const handleUpdate = useCallback(async () => {

@@ -7,7 +7,7 @@ export const openAppStore = async (
   let storeUrl: string;
 
   if (platform === "ios") {
-    storeUrl = `https://apps.apple.com/app/id/${appstoreId}`;
+    storeUrl = `https://apps.apple.com/app/id${appstoreId}`;
   } else {
     storeUrl = `https://play.google.com/store/apps/details?id=${appstoreId}`;
   }

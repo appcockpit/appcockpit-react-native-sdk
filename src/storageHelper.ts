@@ -25,3 +25,28 @@ export const isVersionDismissed = async (
     return false;
   }
 };
+
+// A dismissed maintenance banner stays hidden for that window only: a new or
+// moved window (different start time) is announced again.
+export const getDismissedMaintenanceKey = (appId: string, startsAt: string) =>
+  `ac_dismissed_maintenance_${appId}_${startsAt}`;
+
+export const storeDismissedMaintenance = async (appId: string, startsAt: string) => {
+  try {
+    await AsyncStorage.setItem(getDismissedMaintenanceKey(appId, startsAt), "true");
+  } catch (error) {
+    console.error("Failed to store dismissed maintenance banner:", error);
+  }
+};
+
+export const isMaintenanceDismissed = async (
+  appId: string,
+  startsAt: string
+): Promise<boolean> => {
+  try {
+    return (await AsyncStorage.getItem(getDismissedMaintenanceKey(appId, startsAt))) === "true";
+  } catch (error) {
+    console.error("Failed to check dismissed maintenance banner:", error);
+    return false;
+  }
+};

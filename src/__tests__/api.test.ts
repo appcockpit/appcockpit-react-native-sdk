@@ -1,3 +1,9 @@
+jest.mock(
+  "@react-native-async-storage/async-storage",
+  () => require("./asyncStorageMock").asyncStorageMock,
+  { virtual: true }
+);
+
 import { getMaintenanceMode } from "../maintenance/maintenance";
 import { fetchVersion } from "../versions/api";
 import { authenticate } from "../authenticate/api";
@@ -22,6 +28,7 @@ describe("getMaintenanceMode", () => {
     expect(url).toBe(`${API_BASE_URL}/v2/maintenance?app_id=app1&environment=production`);
     expect(init.headers["x-api-token"]).toBe("tok");
     expect(init.headers["x-client-version"]).toBe(CLIENT_VERSION);
+    expect(init.headers["x-install-id"]).toMatch(/^[0-9a-f-]{36}$/);
   });
 
   it("returns null on HTTP errors and network failures", async () => {

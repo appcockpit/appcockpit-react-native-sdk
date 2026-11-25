@@ -1,4 +1,5 @@
 import { API_BASE_URL, CLIENT_VERSION } from "../constants";
+import { sdkHeaders } from "../installId";
 import { AppInfo, VersionResponse } from "../models";
 
 export const fetchVersion = async (info: AppInfo, apiToken: string) => {
@@ -6,11 +7,7 @@ export const fetchVersion = async (info: AppInfo, apiToken: string) => {
 
   const response = await fetch(url, {
     method: "GET",
-    headers: {
-      "x-api-token": apiToken,
-      "x-client-version": CLIENT_VERSION,
-      "Content-Type": "application/json",
-    },
+    headers: await sdkHeaders(apiToken, CLIENT_VERSION),
   });
 
   if (!response.ok) {

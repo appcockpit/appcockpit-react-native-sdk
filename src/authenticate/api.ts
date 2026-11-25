@@ -1,4 +1,5 @@
 import { API_BASE_URL, CLIENT_VERSION } from "../constants";
+import { sdkHeaders } from "../installId";
 import { AppInfo, AuthenticateResponse } from "../models";
 
 export const authenticate = async (
@@ -10,11 +11,7 @@ export const authenticate = async (
 
   const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "x-api-token": apiToken,
-      "x-client-version": CLIENT_VERSION,
-      "Content-Type": "application/json",
-    },
+    headers: await sdkHeaders(apiToken, CLIENT_VERSION),
     body: JSON.stringify({
       user_id: userId,
       platform: info.platform,

@@ -1,4 +1,5 @@
 import { API_BASE_URL, CLIENT_VERSION } from "../constants";
+import { sdkHeaders } from "../installId";
 import { MaintenanceInfo, MaintenanceResponse } from "../models";
 
 export const getMaintenanceMode = async (
@@ -10,11 +11,7 @@ export const getMaintenanceMode = async (
 
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        "x-api-token": apiToken,
-        "x-client-version": CLIENT_VERSION,
-        "Content-Type": "application/json",
-      },
+      headers: await sdkHeaders(apiToken, CLIENT_VERSION),
     });
 
     if (!response.ok) {

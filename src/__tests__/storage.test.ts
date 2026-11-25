@@ -1,15 +1,9 @@
-const store = new Map<string, string>();
 jest.mock(
   "@react-native-async-storage/async-storage",
-  () => ({
-    __esModule: true,
-    default: {
-      setItem: async (k: string, v: string) => void store.set(k, v),
-      getItem: async (k: string) => store.get(k) ?? null,
-    },
-  }),
+  () => require("./asyncStorageMock").asyncStorageMock,
   { virtual: true }
 );
+import { store } from "./asyncStorageMock";
 
 import {
   isMaintenanceDismissed,
@@ -32,4 +26,15 @@ it("remembers a dismissed maintenance banner per window", async () => {
   expect(await isMaintenanceDismissed("app", "2026-12-05T02:00:00Z")).toBe(true);
   // A moved window is announced again.
   expect(await isMaintenanceDismissed("app", "2026-12-06T02:00:00Z")).toBe(false);
+});
+
+import { getInstallId, resetInstallIdCache } from "../installId";
+
+it("creates one install ID and keeps it", async () => {
+  resetInstallIdCache();
+  const id = await getInstallId();
+  expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  expect(store.get("ac_install_id")).toBe(id);
+  resetInstallIdCache();
+  expect(await getInstallId()).toBe(id); // read back after a restart
 });

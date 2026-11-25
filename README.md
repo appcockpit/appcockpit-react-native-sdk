@@ -32,6 +32,13 @@ the app at the end time. Times are shown in the user's time zone.
 </MaintenanceProvider>
 ```
 
+## Monthly active devices
+
+Appcockpit plans are priced by monthly active devices. The SDK creates a random
+install ID on first launch (stored in AsyncStorage) and sends it with each
+request so these can be counted. It isn't derived from the device or linked to
+your users, and Appcockpit stores only a hash of it.
+
 ## How to use it
 
 Please find a detailed guide in our [Official Documentation](https://docs.appcockpit.dev/integration/react-native)

@@ -1,23 +1,44 @@
-import { FC, PropsWithChildren, useEffect, useState } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { AppState } from "react-native";
 import { getMaintenanceMode } from "../maintenance/maintenance";
+import { maintenanceStateFrom, nextCheckDelayMs } from "../maintenance/schedule";
 import { MaintenanceInfo, MaintenanceResponse } from "../models";
+import { isMaintenanceDismissed, storeDismissedMaintenance } from "../storageHelper";
+import {
+  MaintenanceBanner as DefaultMaintenanceBanner,
+  MaintenanceBannerProps,
+  MaintenanceBannerTheme,
+} from "./MaintenanceBanner";
 import { MaintenanceScreen as DefaultMaintenanceScreen } from "./MaintenanceScreen";
-
-const DEFAULT_POLLING_INTERVAL_MS = 30000;
 
 export type MaintenanceScreenProps = PropsWithChildren<{
   maintenanceInfo: MaintenanceResponse;
 }>;
 
+
 type Props = PropsWithChildren<{
   info: MaintenanceInfo;
   apiToken: string;
   MaintenanceScreen?: FC<MaintenanceScreenProps>;
+  /** Replace the banner shown before a scheduled maintenance window. */
+  MaintenanceBanner?: FC<MaintenanceBannerProps>;
+  /** Show a banner before a scheduled maintenance window. Default true. */
+  showBanner?: boolean;
+  /** Locale for the banner's date and time, e.g. "de-DE". Defaults to the device's. */
+  locale?: string;
   theme?: {
     backgroundColor?: string;
     titleColor?: string;
     messageColor?: string;
     linkColor?: string;
+    banner?: MaintenanceBannerTheme;
   };
 }>;
 
@@ -26,77 +47,79 @@ export const MaintenanceProvider: FC<Props> = ({
   info,
   apiToken,
   MaintenanceScreen,
+  MaintenanceBanner,
+  showBanner = true,
+  locale,
   theme,
 }) => {
-  const [maintenanceInfo, setMaintenanceInfo] =
-    useState<MaintenanceResponse | null>(null);
+  const [response, setResponse] = useState<MaintenanceResponse | null>(null);
+  const [dismissedStart, setDismissedStart] = useState<string | null>(null);
+  // Re-render when a known start/end time passes, even before the next check.
+  const [, setTick] = useState(0);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchMaintenanceInfo = async () => {
-    try {
-      const response = await getMaintenanceMode(info, apiToken);
+  const check = useCallback(async () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
 
-      if (!response || !response.active) {
-        setMaintenanceInfo(null);
-        return;
-      }
-
-      setMaintenanceInfo(response);
-    } catch (error) {
-      console.error("Error fetching maintenance info:", error);
+    const next = await getMaintenanceMode(info, apiToken);
+    setResponse(next);
+    if (next?.upcoming && next.starts_at && (await isMaintenanceDismissed(info.appId, next.starts_at))) {
+      setDismissedStart(next.starts_at);
     }
-  };
+
+    const delay = nextCheckDelayMs(next);
+    if (delay !== null) {
+      timer.current = setTimeout(() => {
+        setTick((t) => t + 1);
+        check();
+      }, delay);
+    }
+  }, [info.appId, info.environment, apiToken]);
 
   useEffect(() => {
-    const checkMaintenanceMode = async () => {
-      const response = await getMaintenanceMode(info, apiToken);
-
-      if (!response || !response.active) {
-        setMaintenanceInfo(null);
-        return;
-      }
-
-      setMaintenanceInfo(response);
-
-      // Only set up polling if maintenance is active
-      const interval = setInterval(
-        fetchMaintenanceInfo,
-        DEFAULT_POLLING_INTERVAL_MS
-      );
-
-      return interval;
-    };
-
-    let interval: NodeJS.Timeout | undefined;
-
-    checkMaintenanceMode().then((intervalId) => {
-      interval = intervalId;
+    check();
+    // Coming back to the app picks up maintenance scheduled in the meantime.
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") check();
     });
-
     return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
+      sub.remove();
+      if (timer.current) clearTimeout(timer.current);
     };
-  }, [info, apiToken]);
+  }, [check]);
 
-  if (!maintenanceInfo || !maintenanceInfo.active) {
-    return children;
+  const state = maintenanceStateFrom(response);
+
+  if (state.kind === "active") {
+    if (MaintenanceScreen) {
+      return <MaintenanceScreen maintenanceInfo={state.info} children={children} />;
+    }
+    return <DefaultMaintenanceScreen maintenanceInfo={state.info} children={children} theme={theme} />;
   }
 
-  if (MaintenanceScreen) {
+  if (state.kind === "upcoming" && showBanner && dismissedStart !== state.info.starts_at) {
+    const bannerProps: MaintenanceBannerProps = {
+      maintenanceInfo: state.info,
+      startsAt: state.startsAt,
+      endsAt: state.endsAt,
+      onDismiss: () => {
+        const startsAt = state.info.starts_at!;
+        setDismissedStart(startsAt);
+        storeDismissedMaintenance(info.appId, startsAt);
+      },
+    };
     return (
-      <MaintenanceScreen
-        maintenanceInfo={maintenanceInfo}
-        children={children}
-      />
+      <>
+        {children}
+        {MaintenanceBanner ? (
+          <MaintenanceBanner {...bannerProps} />
+        ) : (
+          <DefaultMaintenanceBanner {...bannerProps} theme={theme?.banner} locale={locale} />
+        )}
+      </>
     );
   }
 
-  return (
-    <DefaultMaintenanceScreen
-      maintenanceInfo={maintenanceInfo}
-      children={children}
-      theme={theme}
-    />
-  );
+  return children;
 };
